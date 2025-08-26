@@ -185,11 +185,11 @@
 
         function tentukanKegiatan() {
             const jam = new Date().getHours();
-            if (jam >= 4 && jam < 6) return "Sholat Subuh";
-            if (jam >= 6 && jam < 9) return "Setoran Pagi";
-            if (jam >= 17 && jam < 19) return "Sholat Maghrib";
-            if (jam >= 19 && jam < 21) return "Sholat Isya";
-            if (jam >= 21 && jam < 23) return "Setoran Malam";
+            if (jam >= 4 && jam < 5) return "Sholat Subuh";
+            if (jam >= 5 && jam < 8) return "Setoran Pagi";
+            if (jam >= 17 && jam < 18) return "Sholat Maghrib";
+            if (jam >= 19 && jam < 20) return "Sholat Isya";
+            if (jam >= 20 && jam < 23) return "Setoran Malam";
             return "Waktu Istirahat";
         }
         
