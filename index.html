@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi Digital Santri</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Laila:wght@400;700&family=Poppins:wght@300;400;600&display=swap');
+
+        :root {
+            --primary-color: #046307;
+            --secondary-color: #f4b400;
+            --background-color: #fdfaf6;
+            --text-color: #333;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23e8f5e9" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 2.5rem 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            border-top: 5px solid var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        .header h1 {
+            font-family: 'Laila', serif;
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="file"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .status-options {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1rem;
+        }
+
+        .status-options label {
+            cursor: pointer;
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .status-options input[type="radio"] {
+            display: none;
+        }
+
+        .status-options input[type="radio"]:checked + label {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .form-group-upload {
+            display: none; /* Initially hidden */
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, var(--primary-color), #0a9a0d);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            margin-top: 1.5rem;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        #message {
+            margin-top: 1rem;
+            font-weight: 600;
+        }
+        .success { color: var(--primary-color); }
+        .error { color: #d9534f; }
+        
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Absensi Digital</h1>
+            <p id="kegiatan-title">Memuat kegiatan...</p>
+        </div>
+
+        <form id="absenForm">
+            <input type="hidden" id="kegiatan" name="kegiatan">
+            
+            <div class="form-group">
+                <label for="nama">Nama Lengkap</label>
+                <input type="text" id="nama" name="nama" required>
+            </div>
+
+            <div class="form-group">
+                <label>Status Kehadiran</label>
+                <div class="status-options">
+                    <input type="radio" id="hadir" name="status" value="Hadir" required>
+                    <label for="hadir">Hadir</label>
+                    
+                    <input type="radio" id="izin" name="status" value="Izin">
+                    <label for="izin">Izin</label>
+                    
+                    <input type="radio" id="alfa" name="status" value="Alfa">
+                    <label for="alfa">Alfa</label>
+                </div>
+            </div>
+
+            <div class="form-group form-group-upload" id="upload-section">
+                <label for="file">Upload Bukti Foto</label>
+                <input type="file" id="file" name="file" accept="image/*">
+            </div>
+
+            <button type="submit" id="submitBtn">Kirim Absen</button>
+        </form>
+        
+        <div id="message"></div>
+        <div class="footer">
+            <p>&copy; 2025 - Pesantren Digital</p>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIDFxh81iAuWZSaJFTywFh7MftcfgFchTXaVn9WgVHdGJJ2prFiAdcEK61MtIjOuHe/exec";
+
+        const kegiatanTitle = document.getElementById('kegiatan-title');
+        const kegiatanInput = document.getElementById('kegiatan');
+        const form = document.getElementById('absenForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const messageDiv = document.getElementById('message');
+        const uploadSection = document.getElementById('upload-section');
+        const fileInput = document.getElementById('file');
+
+        // Fungsi untuk menentukan kegiatan berdasarkan waktu
+        function tentukanKegiatan() {
+            const jam = new Date().getHours();
+            if (jam >= 4 && jam < 6) return "Sholat Subuh";
+            if (jam >= 6 && jam < 9) return "Setoran Pagi";
+            if (jam >= 17 && jam < 19) return "Sholat Maghrib";
+            if (jam >= 19 && jam < 21) return "Sholat Isya";
+            if (jam >= 21 && jam < 23) return "Setoran Malam";
+            return "Waktu Istirahat";
+        }
+        
+        // Atur judul dan nilai form saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            const kegiatanSaatIni = tentukanKegiatan();
+            kegiatanTitle.textContent = `Absensi ${kegiatanSaatIni}`;
+            kegiatanInput.value = kegiatanSaatIni;
+
+            if (kegiatanSaatIni === "Waktu Istirahat") {
+                submitBtn.disabled = true;
+                submitBtn.textContent = "Bukan Waktu Absen";
+                form.style.display = 'none';
+                messageDiv.textContent = 'Silakan kembali pada waktu kegiatan berikutnya.';
+            }
+        });
+
+        // Tampilkan/sembunyikan input file berdasarkan status
+        form.status.forEach(radio => {
+            radio.addEventListener('change', () => {
+                if (radio.value === 'Hadir') {
+                    uploadSection.style.display = 'block';
+                    fileInput.required = true;
+                } else {
+                    uploadSection.style.display = 'none';
+                    fileInput.required = false;
+                }
+            });
+        });
+
+        // Kirim data saat form disubmit
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Mengirim...';
+            messageDiv.textContent = '';
+            messageDiv.className = '';
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            // Jika ada file, baca sebagai DataURL. Jika tidak, kirim langsung.
+            if (file && fileInput.required) {
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    const fileData = reader.result;
+                    const data = {
+                        nama: form.nama.value,
+                        kegiatan: form.kegiatan.value,
+                        status: form.status.value,
+                        file: fileData,
+                        filename: file.name
+                    };
+                    sendData(data);
+                };
+                reader.onerror = (error) => {
+                    handleResponse(false, 'Gagal membaca file.');
+                    console.error('File Reader Error:', error);
+                };
+            } else {
+                // Kirim data tanpa file
+                const data = {
+                    nama: form.nama.value,
+                    kegiatan: form.kegiatan.value,
+                    status: form.status.value,
+                };
+                sendData(data);
+            }
+        });
+
+        function sendData(data) {
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(data) // Kirim sebagai JSON
+            })
+            .then(res => res.json())
+            .then(response => {
+                if (response.status === 'success') {
+                    handleResponse(true, response.message);
+                    form.reset();
+                    uploadSection.style.display = 'none';
+                } else {
+                    throw new Error(response.message);
+                }
+            })
+            .catch(error => {
+                handleResponse(false, 'Terjadi kesalahan: ' + error.message);
+                console.error('Error!', error.message);
+            });
+        }
+        
+        function handleResponse(success, msg) {
+            messageDiv.textContent = msg;
+            messageDiv.className = success ? 'success' : 'error';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Kirim Absen';
+        }
+
+    </script>
+</body>
+</html>
