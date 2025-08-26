@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Absensi Digital Santri</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Laila:wght@400;700&family=Poppins:wght@300;400;600&display=swap');
 
@@ -38,7 +41,6 @@
             max-width: 450px;
             text-align: center;
             border-top: 5px solid var(--primary-color);
-            transition: transform 0.3s ease;
         }
 
         .header h1 {
@@ -75,7 +77,6 @@
             border: 1px solid #ccc;
             box-sizing: border-box;
             font-family: 'Poppins', sans-serif;
-            transition: border-color 0.3s ease;
         }
         
         .status-options {
@@ -95,9 +96,7 @@
             text-align: center;
         }
 
-        .status-options input[type="radio"] {
-            display: none;
-        }
+        .status-options input[type="radio"] { display: none; }
 
         .status-options input[type="radio"]:checked + label {
             background-color: var(--primary-color);
@@ -172,6 +171,7 @@
     </div>
 
     <script>
+        // REVISI: URL Script sudah diperbarui
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxyjbxR68iwha7_u2g-JHe09UVzThzxH9LgvtvoJ4Xd4cB558F67-6NySpQITZ9BVAT/exec";
 
         const kegiatanTitle = document.getElementById('kegiatan-title');
@@ -181,8 +181,9 @@
         const messageDiv = document.getElementById('message');
         const uploadSection = document.getElementById('upload-section');
         const fileInput = document.getElementById('file');
-        const fileLabel = document.getElementById('file-label'); // Ambil elemen label file
+        const fileLabel = document.getElementById('file-label');
 
+        // REVISI: Jadwal kegiatan sudah diperbarui
         function tentukanKegiatan() {
             const jam = new Date().getHours();
             if (jam >= 4 && jam < 5) return "Sholat Subuh";
@@ -205,40 +206,42 @@
             }
         });
 
-        // REVISI TOTAL: Logika untuk menampilkan upload foto
         form.status.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 const selectedStatus = e.target.value;
-                
-                // Tampilkan bagian upload dan jadikan wajib untuk SEMUA status
                 uploadSection.style.display = 'block';
                 fileInput.required = true;
-
-                // Ubah teks label sesuai status yang dipilih
-                if (selectedStatus === 'Hadir') {
-                    fileLabel.textContent = 'Upload Bukti Foto Kehadiran';
-                } else if (selectedStatus === 'Izin') {
-                    fileLabel.textContent = 'Upload Foto Surat Izin';
-                } else if (selectedStatus === 'Sakit') {
-                    fileLabel.textContent = 'Upload Foto Surat Sakit';
-                }
+                if (selectedStatus === 'Hadir') fileLabel.textContent = 'Upload Bukti Foto Kehadiran';
+                else if (selectedStatus === 'Izin') fileLabel.textContent = 'Upload Foto Surat Izin';
+                else if (selectedStatus === 'Sakit') fileLabel.textContent = 'Upload Foto Surat Sakit';
             });
         });
 
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Mengirim...';
+            submitBtn.textContent = 'Mengompres & Mengirim...';
             messageDiv.textContent = '';
             messageDiv.className = '';
 
-            const file = fileInput.files[0];
-            
-            // Karena sekarang semua status wajib upload, kita sederhanakan
-            if (file) {
+            const originalFile = fileInput.files[0];
+            if (!originalFile) {
+                handleResponse(false, 'Mohon unggah file bukti.');
+                return;
+            }
+
+            const options = {
+                maxSizeMB: 1,
+                maxWidthOrHeight: 1080,
+                useWebWorker: true
+            }
+
+            try {
+                const compressedFile = await imageCompression(originalFile, options);
+                
                 const reader = new FileReader();
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(compressedFile);
                 reader.onload = () => {
                     const fileData = reader.result;
                     const data = {
@@ -246,16 +249,19 @@
                         kegiatan: form.kegiatan.value,
                         status: form.status.value,
                         file: fileData,
-                        filename: file.name
+                        filename: compressedFile.name
                     };
                     sendData(data);
                 };
-                reader.onerror = () => handleResponse(false, 'Gagal membaca file.');
-            } else {
-                // Ini seharusnya tidak terjadi jika validasi `required` berjalan
-                handleResponse(false, 'Mohon unggah file bukti.');
+                reader.onerror = () => handleResponse(false, 'Gagal membaca file hasil kompresi.');
+
+            } catch (error) {
+                console.error('Error saat kompresi:', error);
+                handleResponse(false, 'Gagal mengompres foto. Silakan coba lagi.');
             }
-        });
+        }
+
+        form.addEventListener('submit', handleFormSubmit);
 
         function sendData(data) {
             fetch(SCRIPT_URL, {
